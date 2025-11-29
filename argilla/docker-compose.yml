@@ -7,25 +7,19 @@ services:
     ports:
       - "6900:6900"
     environment:
-      # Configuration de base
+      # Base config
       ARGILLA_HOME_PATH: /var/lib/argilla
       ARGILLA_ELASTICSEARCH: http://elasticsearch:9200
-      
-      # Configuration Redis (IMPORTANT!)
       ARGILLA_REDIS_URL: redis://redis:6379/0
-      
-      # Authentification (changez ces valeurs!)
-      ARGILLA_AUTH_SECRET_KEY: "ad5f1c3f9d04882fbe768c8f782df2e6a37e5c94efb25ea5ddc215c0cfebd12a"
-      
-      # Credentials 
-      USERNAME: fatnaoui
-      PASSWORD: fatnaoui
-      WORKSPACE: argilla
-      DEFAULT_USER_PASSWORD: fatnaoui
-      DEFAULT_USER_API_KEY: argilla.apikey
-      
-      # Configuration de la base de données
       ARGILLA_DATABASE_URL: postgresql+asyncpg://argilla:argilla@postgres:5432/argilla
+      ARGILLA_AUTH_SECRET_KEY: "ad5f1c3f9d04882fbe768c8f782df2e6a37e5c94efb25ea5ddc215c0cfebd12a"
+      ARGILLA_SEARCH_ENGINE: "elasticsearch"
+
+      # First (owner) user – this is YOU
+      USERNAME: "fatnaoui"
+      PASSWORD: "fatnaoui"
+      API_KEY: "fatnaoui.apikey"   # any string you like
+
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -45,7 +39,7 @@ services:
       retries: 3
       start_period: 60s
 
-  # Service Elasticsearch
+  # Elasticsearch
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
     environment:
@@ -67,7 +61,7 @@ services:
       retries: 3
       start_period: 60s
 
-  # Service Redis (NOUVEAU - REQUIS)
+  # Redis
   redis:
     image: redis:7.2-alpine
     ports:
@@ -85,7 +79,7 @@ services:
       retries: 3
       start_period: 10s
 
-  # Service PostgreSQL (NOUVEAU - RECOMMANDÉ)
+  # PostgreSQL
   postgres:
     image: postgres:15-alpine
     environment:
