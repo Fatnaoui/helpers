@@ -1,0 +1,2 @@
+rgilla==2.8.0
+notebook==7.5.0
