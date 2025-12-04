@@ -1,3 +1,4 @@
+import unicodedata
 import re
 
 def is_mostly_ascii_letters_and_punct(s, min_ratio=0.7):
@@ -32,3 +33,18 @@ def looks_like_clean_english(sent):
         return False
 
     return True
+
+INVISIBLE_CATEGORIES = {"Cf", "Cc"}  # format & control chars
+
+def remove_invisible_chars(s: str) -> str:
+    # 1) map weird spaces to normal space
+    s = s.replace('\u00A0', ' ')   # no-break space
+    # 2) drop zero-width / directional marks etc.
+    s = ''.join(
+        ch for ch in s
+        if unicodedata.category(ch) not in INVISIBLE_CATEGORIES
+    )
+    # 3) normalize whitespace
+    s = re.sub(r'\s+', ' ', s).strip()
+    return s
+
