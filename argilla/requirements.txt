@@ -1,2 +1,4 @@
-rgilla==2.8.0
+argilla==2.8.0
 notebook==7.5.0
+uvicorn==0.38.0
+fastapi==0.123.9

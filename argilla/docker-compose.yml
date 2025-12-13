@@ -1,13 +1,14 @@
 version: '3.8'
 
 services:
-  # Service Argilla
+  # Service Argilla (API/UI)
   argilla:
     image: argilla/argilla-server:latest
     ports:
       - "6900:6900"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      # Base config
       ARGILLA_HOME_PATH: /var/lib/argilla
       ARGILLA_ELASTICSEARCH: http://elasticsearch:9200
       ARGILLA_REDIS_URL: redis://redis:6379/0
@@ -15,10 +16,9 @@ services:
       ARGILLA_AUTH_SECRET_KEY: "ad5f1c3f9d04882fbe768c8f782df2e6a37e5c94efb25ea5ddc215c0cfebd12a"
       ARGILLA_SEARCH_ENGINE: "elasticsearch"
 
-      # First (owner) user – this is YOU
       USERNAME: "fatnaoui"
       PASSWORD: "fatnaoui"
-      API_KEY: "fatnaoui.apikey"   # any string you like
+      API_KEY: "fatnaoui.apikey"
 
     depends_on:
       elasticsearch:
@@ -38,6 +38,32 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
+  worker:
+    image: argilla/argilla-server:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      ARGILLA_HOME_PATH: /var/lib/argilla
+      ARGILLA_ELASTICSEARCH: http://elasticsearch:9200
+      ARGILLA_REDIS_URL: redis://redis:6379/0
+      ARGILLA_DATABASE_URL: postgresql+asyncpg://argilla:argilla@postgres:5432/argilla
+      ARGILLA_AUTH_SECRET_KEY: "ad5f1c3f9d04882fbe768c8f782df2e6a37e5c94efb25ea5ddc215c0cfebd12a"
+      ARGILLA_SEARCH_ENGINE: "elasticsearch"
+    command: ["python", "-m", "argilla_server", "worker", "--num-workers", "2"]
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - argilla-data:/var/lib/argilla
+    networks:
+      - argilla-network
+    restart: unless-stopped
+
 
   # Elasticsearch
   elasticsearch:
@@ -109,3 +135,4 @@ volumes:
 networks:
   argilla-network:
     driver: bridge
+
