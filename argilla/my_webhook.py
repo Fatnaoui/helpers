@@ -16,28 +16,32 @@ client = rg.Argilla(
     api_key=API_KEY,
 )
 
-dataset = client.datasets(name="Darija_validation")
+dataset = client.datasets(name="Darija_validation", workspace="langID_validation")
 
 @webhook_listener(events=["record.completed"])
 async def my_webhook_handler(record: rg.Record, type: str, timestamp: datetime):
     print("##########################")
     print(record)
-    print(dataset)
     print("##########################")
     status = getattr(record, "status")
+    if str(status) != "completed":
+        return 
     print(str(status))
-    fields = getattr(record, "fields")
-    text = fields["text"]
-    print(text)
-    responses = getattr(record, "responses")
-    language = responses["language"]
-    value = language[0]
-    value = getattr(value,"value")
-    print(value)
-    if str(status) == "completed":
-    	print("everything is okay")
-    	data = [{"text": text,"language": value}]
-    	dataset.records.log(data)
+    metadata = getattr(record, "metadata")
+    category = metadata["category"]
+    if str(category) != "origin":
+        return 
+    if str(category) == "origin":
+        fields = getattr(record, "fields")
+        text = fields["text"]
+        
+        responses = getattr(record, "responses")
+        language = responses["language"]
+        value = language[0]
+        value = getattr(value,"value")
+        print(value)
+        data = [{"text": text,"language": value, "category": "validated"}]
+        dataset.records.log(data)
     	
 server = get_webhook_server()
 
