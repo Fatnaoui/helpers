@@ -1,7 +1,0 @@
-__label__positive this movie was amazing
-__label__negative this movie was boring
-__label__positive i really loved this film
-__label__negative the film was terrible
-__label__positive what a fantastic experience
-__label__negative i hated this movie
-
