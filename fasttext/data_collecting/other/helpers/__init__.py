@@ -1,1 +1,1 @@
-from other.helpers.filtering import is_mostly_lang_script, looks_like_clean_generic, remove_invisible_chars
+from helpers.filtering import is_mostly_lang_script, looks_like_clean_generic, remove_invisible_chars
